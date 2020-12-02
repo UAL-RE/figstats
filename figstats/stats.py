@@ -36,7 +36,24 @@ class Figshare:
             # Using non-institution one since that seems to give correct stats
             url = self.endpoint(join('total', counter, item, str(item_id)),
                                 institution=institution)
-            print(url)
             result = issue_request('GET', url, headers=self.headers)
             total_dict[counter] = result['totals']
+        return total_dict
+
+    def get_user_totals(self, author_id):
+        # author_id is not the same as institution_user_id for institutional accounts
+        total_dict = self.get_totals(author_id, item='author',
+                                     institution=self.institution)
+        return total_dict
+
+    def get_timeline(self, item_id, item='article', granularity='day',
+                     institution=False):
+        total_dict = {}
+        for counter in ['views', 'downloads', 'shares']:
+            # Using non-institution one since that seems to give correct stats
+            urls = ['timeline', granularity, counter, item, str(item_id)]
+            url = self.endpoint(join(*urls), institution=institution)
+            print(url)
+            result = issue_request('GET', url, headers=self.headers)
+            total_dict[counter] = result['timeline']
         return total_dict
