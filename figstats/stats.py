@@ -140,6 +140,22 @@ class Figshare:
 
         return accounts_df
 
+    def retrieve_institution_articles(self):
+
+        url = join(self.main_baseurl_institute, "articles")
+
+        # Figshare API is limited to a maximum of 1000 per page
+        params = {'page': 1,
+                  'page_size': 1000}
+        articles = issue_request('GET', url, self.api_headers, params=params)
+
+        articles_df = pd.DataFrame(articles)
+
+        # Only consider published dataset
+        articles_df = articles_df.loc[articles_df['published_date'].notnull()]
+        articles_df = articles_df.reset_index()
+        return articles_df
+
     def get_institution_totals(self, df=None, by_method='author'):
         """
         Retrieve total views, downloads, and shares by either authors or articles
@@ -149,17 +165,21 @@ class Figshare:
             if by_method == 'author':
                 df = self.retrieve_institution_users(ignore_admin=False)
             if by_method == 'article':
-                print("Need to retrieve articles")
+                df = self.retrieve_institution_articles()
 
         total_dict = dict()
         for i in df.index:
             print(f"{i+1} of {len(df.index)}")
             record = df.loc[i]
-            first_name = record['first_name']
-            last_name = record['last_name']
-            author_id = record['author_id']
-            total_dict[f"{first_name} {last_name} ({author_id})"] = self.get_user_totals(author_id)
-
+            if by_method == 'author':
+                first_name = record['first_name']
+                last_name = record['last_name']
+                author_id = record['author_id']
+                total_dict[f"{first_name} {last_name} ({author_id})"] = self.get_user_totals(author_id)
+            if by_method == 'article':
+                total_dict[f"{record['id']}"] = self.get_totals(record['id'],
+                                                                item='article',
+                                                                institution=False)
         # Construct pandas DataFrame
         total_df = pd.DataFrame.from_dict(total_dict, orient='index')
         return total_df
