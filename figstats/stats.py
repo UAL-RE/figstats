@@ -152,8 +152,13 @@ class Figshare:
                 print("Need to retrieve articles")
 
         total_dict = dict()
-        for author_id in df.loc[0:5, 'author_id']:
-            total_dict[str(author_id)] = self.get_user_totals(author_id)
+        for i in df.index:
+            print(f"{i+1} of {len(df.index)}")
+            record = df.loc[i]
+            first_name = record['first_name']
+            last_name = record['last_name']
+            author_id = record['author_id']
+            total_dict[f"{first_name} {last_name} ({author_id})"] = self.get_user_totals(author_id)
 
         # Construct pandas DataFrame
         total_df = pd.DataFrame.from_dict(total_dict, orient='index')
