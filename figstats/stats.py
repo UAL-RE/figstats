@@ -1,6 +1,5 @@
 from os.path import join
-
-# from ldcoolp.curation.api.figshare import FigshareInstituteAdmin
+import pandas as pd
 
 from .commons import issue_request
 
@@ -26,6 +25,11 @@ class Figshare:
         self.basic_token = basic_token
         if self.basic_token:
             self.basic_headers['Authorization'] = f'Basic {self.basic_token}'
+
+        # For Figshare API
+        self.main_baseurl = 'https://api.figshare.com/v2/account/'
+        if self.institution:
+            self.main_baseurl_institute = join(self.main_baseurl, "institution")
 
         # API token
         self.api_headers = {'Content-Type': 'application/json'}
@@ -82,3 +86,56 @@ class Figshare:
             result = issue_request('GET', url, headers=self.basic_headers)
             total_dict[counter] = result['timeline']
         return total_dict
+
+    def get_figshare_id(self, accounts_df):
+        """
+        Retrieve Figshare account ID(s)
+        Note: This is not the institutional ID, but one associated with
+              the unique profile
+
+        :param accounts_df: pandas DataFrame containing institution ID
+        :return: accounts_df: The input DataFrame with an additional column
+        """
+
+        endpoint = join(self.main_baseurl_institute, "users")
+
+        author_id = []
+        for institute_id in accounts_df['id']:
+            url = f"{endpoint}/{institute_id}"
+            response = issue_request('GET', url, self.api_headers)
+            author_id.append(response['id'])
+        accounts_df['author_id'] = author_id
+        return accounts_df
+
+    def retrieve_institution_users(self, ignore_admin=False):
+        """
+        Retrieve accounts within institutional instance
+
+        This is based on LD-Cool-P get_account_list method of FigshareInstituteAdmin
+        It includes retrieving the default author_id
+
+        It uses:
+        https://docs.figshare.com/#private_institution_accounts_list
+        https://docs.figshare.com/#private_account_institution_user
+        """
+        url = join(self.main_baseurl_institute, "accounts")
+
+        # Figshare API is limited to a maximum of 1000 per page
+        params = {'page': 1, 'page_size': 1000}
+        accounts = issue_request('GET', url, self.api_headers, params=params)
+
+        accounts_df = pd.DataFrame(accounts)
+        accounts_df = accounts_df.drop(columns='institution_id')
+
+        if ignore_admin:
+            print("Excluding administrative and test accounts")
+
+            drop_index = list(accounts_df[accounts_df['email'] ==
+                                          'data-management@email.arizona.edu'].index)
+            drop_index += list(accounts_df[accounts_df['email'].str.contains('-test@email.arizona.edu')].index)
+
+            accounts_df = accounts_df.drop(drop_index).reset_index(drop=True)
+
+        accounts_df = self.get_figshare_id(accounts_df)
+
+        return accounts_df
