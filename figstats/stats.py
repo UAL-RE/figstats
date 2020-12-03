@@ -139,3 +139,22 @@ class Figshare:
         accounts_df = self.get_figshare_id(accounts_df)
 
         return accounts_df
+
+    def get_institution_totals(self, df=None, by_method='author'):
+        """
+        Retrieve total views, downloads, and shares by either authors or articles
+        """
+
+        if isinstance(df, type(None)):
+            if by_method == 'author':
+                df = self.retrieve_institution_users(ignore_admin=False)
+            if by_method == 'article':
+                print("Need to retrieve articles")
+
+        total_dict = dict()
+        for author_id in df.loc[0:5, 'author_id']:
+            total_dict[str(author_id)] = self.get_user_totals(author_id)
+
+        # Construct pandas DataFrame
+        total_df = pd.DataFrame.from_dict(total_dict, orient='index')
+        return total_df
