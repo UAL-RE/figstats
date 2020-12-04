@@ -88,9 +88,15 @@ class Figshare:
             result_sort = {}
             cum_dict = {}
             count = 0
-            for key in sorted(result['timeline']):
-                result_sort[key] = result['timeline'][key]
-                count += result['timeline'][key]
+            # Use views record for timeline (most populated generally)
+            if counter == 'views':
+                save_date = sorted(result['timeline'])
+            for key in save_date:
+                try:
+                    result_sort[key] = result['timeline'][key]
+                    count += result['timeline'][key]
+                except KeyError:
+                    pass
                 cum_dict[key] = count
             timeline_dict[counter] = result_sort
             timeline_dict[f"{counter}-cum"] = cum_dict
