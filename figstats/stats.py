@@ -78,14 +78,18 @@ class Figshare:
 
     def get_timeline(self, item_id, item='article', granularity='day',
                      institution=False):
-        total_dict = {}
+        timeline_dict = {}
         for counter in ['views', 'downloads', 'shares']:
             # Using non-institution one since that seems to give correct stats
             urls = ['timeline', granularity, counter, item, str(item_id)]
             url = self.stats_endpoint(join(*urls), institution=institution)
             result = issue_request('GET', url, headers=self.basic_headers)
-            total_dict[counter] = result['timeline']
-        return total_dict
+            # Sort contents by date
+            result_sort = {}
+            for key in sorted(result['timeline']):
+                result_sort[key] = result['timeline'][key]
+            timeline_dict[counter] = result_sort
+        return timeline_dict
 
     def get_figshare_id(self, accounts_df):
         """
