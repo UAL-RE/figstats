@@ -86,9 +86,14 @@ class Figshare:
             result = issue_request('GET', url, headers=self.basic_headers)
             # Sort contents by date
             result_sort = {}
+            cum_dict = {}
+            count = 0
             for key in sorted(result['timeline']):
                 result_sort[key] = result['timeline'][key]
+                count += result['timeline'][key]
+                cum_dict[key] = count
             timeline_dict[counter] = result_sort
+            timeline_dict[f"{counter}-cum"] = cum_dict
         return timeline_dict
 
     def get_figshare_id(self, accounts_df):
