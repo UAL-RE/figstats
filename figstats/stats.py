@@ -171,6 +171,13 @@ class Figshare:
         articles_df = articles_df.reset_index()
         return articles_df
 
+    def retrieve_article_details(self, article_id):
+        """Retrieve article details"""
+        url = join('https://api.figshare.com/v2/', f"articles/{article_id}")
+
+        article_dict = issue_request('GET', url, self.basic_headers)
+        return article_dict
+
     def get_institution_totals(self, df=None, by_method='author'):
         """
         Retrieve total views, downloads, and shares by either authors or articles
