@@ -10,7 +10,7 @@ def matplotlib_date_format(date_list):
     return datetime_list
 
 
-def plot_timeline(timeline_dict, article_dict):
+def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
     """
     Purpose:
       Plot timeline showing views and downloads
@@ -19,6 +19,10 @@ def plot_timeline(timeline_dict, article_dict):
            From stats.Figshare.get_timeline
     :param article_dict: dictionary of article details.
            From stats.Figshare.retrieve_article_details
+    :param out_pdf: Output filename. Default: timeline_<article_id>.pdf
+    :param save: bool to save PDF file. Otherwise return matplotlib fig object
+
+    :return fig: If save == False, fig is returned
     """
     datetime_list = matplotlib_date_format(list(timeline_dict['views'].keys()))
     fig, [ax0, ax1] = plt.subplots(ncols=2, nrows=2,
@@ -69,3 +73,10 @@ def plot_timeline(timeline_dict, article_dict):
     fig.set_size_inches(8, 6)
     plt.subplots_adjust(left=0.09, bottom=0.1, top=0.90, right=0.985,
                         hspace=0.025)
+
+    if save:
+        if isinstance(out_pdf, type(None)):
+            out_pdf = f"timeline_{article_dict['id']}.pdf"
+        fig.savefig(out_pdf)
+    else:
+        return fig
