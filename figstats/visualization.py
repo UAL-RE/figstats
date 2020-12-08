@@ -10,6 +10,17 @@ def matplotlib_date_format(date_list):
     return datetime_list
 
 
+def plot_shares(ax, timeline_dict):
+    shares_dict = timeline_dict['shares']
+    non_zero = [key for key in shares_dict.keys() if shares_dict[key] > 0]
+
+    if len(non_zero) > 0:
+        dates = matplotlib_date_format(non_zero)
+        for date, key in zip(dates, non_zero):
+            ax.axvline(x=date, color='red')
+            ax.text(date, 10, f"{shares_dict[key]}", color='red')
+
+
 def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
     """
     Purpose:
@@ -57,6 +68,8 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
         ax0[ii].annotate(f'Total {counter}: {max(y_top)}', (0.025, 0.975),
                          xycoords='axes fraction', va='top', ha='left')
         # ax0[ii].set_xlabel('Date')
+
+        plot_shares(ax0[ii], timeline_dict)
 
     # Heading containing title, author, license, DOI
     heading = f"Title: {article_dict['title']}\n"
