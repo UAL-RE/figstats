@@ -18,7 +18,8 @@ def plot_shares(ax, timeline_dict):
         dates = matplotlib_date_format(non_zero)
         for date, key in zip(dates, non_zero):
             ax.axvline(x=date, color='red')
-            ax.text(date, 10, f"{shares_dict[key]}", color='red')
+            ax.text(date, 1, f"{shares_dict[key]}", color='red',
+                    ha='right', va='bottom')
 
 
 def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
@@ -56,10 +57,12 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
         ax1[ii].annotate(f'Maximum daily {counter}: {max(y_bottom)}',
                          (0.025, 0.95), xycoords='axes fraction',
                          va='top', ha='left')
+        ax1[ii].set_ylim(bottom=0)
 
         # Top panels
         y_top = timeline_dict[counter+'-cum'].values()
-        ax0[ii].bar(datetime_list, y_top)
+        ax0[ii].plot(datetime_list, y_top, linestyle='-', linewidth=2.0,
+                     marker='')
         ax0[ii].xaxis.set_major_locator(locator)
         ax0[ii].xaxis.set_major_formatter(formatter)
         ax0[ii].set_xticklabels('')
@@ -68,20 +71,25 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
         ax0[ii].annotate(f'Total {counter}: {max(y_top)}', (0.025, 0.975),
                          xycoords='axes fraction', va='top', ha='left')
         # ax0[ii].set_xlabel('Date')
+        ax0[ii].set_ylim(bottom=0)
 
         plot_shares(ax0[ii], timeline_dict)
 
     # Heading containing title, author, license, DOI
-    heading = f"Title: {article_dict['title']}\n"
+    left_heading = f"Title: {article_dict['title']}\n"
     author_list = [auth_dict['full_name'] for auth_dict in article_dict['authors']]
     if len(author_list) > 3:
-        heading += f"Authors: {author_list[0]} et al.\n"
+        left_heading += f"Authors: {author_list[0]} et al.\n"
     else:
-        heading += f"Authors: {' '.join(author_list)}\n"
-    heading += f"License: {article_dict['license']['name']}  "
-    heading += f"DOI: https://doi.org/{article_dict['doi']}"
-    ax0[0].text(0.01, 1.15, heading, ha='left', va='top',
+        left_heading += f"Authors: {' '.join(author_list)}\n"
+    left_heading += f"License: {article_dict['license']['name']}  "
+    left_heading += f"DOI: https://doi.org/{article_dict['doi']}"
+    ax0[0].text(0.01, 1.15, left_heading, ha='left', va='top',
                 transform=ax0[0].transAxes)
+
+    right_heading = f"Shares: {max(timeline_dict['shares-cum'].values())}"
+    ax0[1].text(1.0, 1.15, right_heading, ha='right', va='top',
+                transform=ax0[1].transAxes)
 
     fig.set_size_inches(8, 6)
     plt.subplots_adjust(left=0.09, bottom=0.1, top=0.90, right=0.985,
