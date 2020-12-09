@@ -3,6 +3,8 @@ import pandas as pd
 
 from .commons import issue_request
 
+counter_list = ['views', 'downloads', 'shares']
+
 
 class Figshare:
     """
@@ -56,7 +58,7 @@ class Figshare:
             raise ValueError("Incorrect item type")
 
         total_dict = {}
-        for counter in ['views', 'downloads', 'shares']:
+        for counter in counter_list:
             # Using non-institution one since that seems to give correct stats
             url = self.stats_endpoint(join('total', counter, item, str(item_id)),
                                       institution=institution)
@@ -79,7 +81,7 @@ class Figshare:
     def get_timeline(self, item_id, item='article', granularity='day',
                      institution=False):
         timeline_dict = {}
-        for counter in ['views', 'downloads', 'shares']:
+        for counter in counter_list:
             # Using non-institution one since that seems to give correct stats
             urls = ['timeline', granularity, counter, item, str(item_id)]
             url = self.stats_endpoint(join(*urls), institution=institution)
