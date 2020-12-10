@@ -94,11 +94,15 @@ class Figshare:
             if counter == 'views':
                 save_date = sorted(result['timeline'])
             for key in save_date:
-                try:
-                    result_sort[key] = result['timeline'][key]
-                    count += result['timeline'][key]
-                except KeyError:
+                if isinstance(result['timeline'], type(None)):
+                    # Handle when counter is not available (NoneType)
                     result_sort[key] = 0
+                else:
+                    try:
+                        result_sort[key] = result['timeline'][key]
+                        count += result['timeline'][key]
+                    except KeyError:
+                        result_sort[key] = 0
                 cum_dict[key] = count
             timeline_dict[counter] = result_sort
             timeline_dict[f"{counter}-cum"] = cum_dict
