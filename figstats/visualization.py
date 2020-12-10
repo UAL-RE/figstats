@@ -4,7 +4,7 @@ import matplotlib.dates as m_dates
 
 from textwrap import wrap
 
-title_width = 80
+title_width = 75
 
 
 def matplotlib_date_format(date_list):
