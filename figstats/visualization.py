@@ -2,6 +2,10 @@ from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.dates as m_dates
 
+from textwrap import wrap
+
+title_width = 80
+
 
 def matplotlib_date_format(date_list):
     """Generate list of datetime objects"""
@@ -76,7 +80,13 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
         plot_shares(ax0[ii], timeline_dict)
 
     # Heading containing title, author, license, DOI
-    left_heading = f"Title: {article_dict['title']}\n"
+
+    title_chunks = wrap(article_dict['title'], title_width)
+    for cc in range(len(title_chunks)):
+        if cc == 0:
+            left_heading = f"Title: {title_chunks[cc]}\n"
+        else:
+            left_heading += f"         {title_chunks[cc]}\n"
     author_list = [auth_dict['full_name'] for auth_dict in article_dict['authors']]
     if len(author_list) > 3:
         left_heading += f"Authors: {author_list[0]} et al.\n"
@@ -84,15 +94,15 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
         left_heading += f"Authors: {' '.join(author_list)}\n"
     left_heading += f"License: {article_dict['license']['name']}  "
     left_heading += f"DOI: https://doi.org/{article_dict['doi']}"
-    ax0[0].text(0.01, 1.15, left_heading, ha='left', va='top',
+    ax0[0].text(0.01, 1.25, left_heading, ha='left', va='top',
                 transform=ax0[0].transAxes)
 
     right_heading = f"Shares: {max(timeline_dict['shares-cum'].values())}"
-    ax0[1].text(1.0, 1.15, right_heading, ha='right', va='top',
+    ax0[1].text(1.0, 1.25, right_heading, ha='right', va='top',
                 transform=ax0[1].transAxes)
 
     fig.set_size_inches(8, 6)
-    plt.subplots_adjust(left=0.09, bottom=0.1, top=0.90, right=0.985,
+    plt.subplots_adjust(left=0.09, bottom=0.08, top=0.85, right=0.985,
                         hspace=0.025)
 
     if save:
