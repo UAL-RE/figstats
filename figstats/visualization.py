@@ -1,20 +1,24 @@
+from typing import Union
 from datetime import datetime as dt
+
 import matplotlib.pyplot as plt
 import matplotlib.dates as m_dates
+from matplotlib import figure, axes
 
 from textwrap import wrap
 
 title_width = 75
 
 
-def matplotlib_date_format(date_list):
+def matplotlib_date_format(date_list: list) -> list:
     """Generate list of datetime objects"""
     datetime_list = [dt.strptime(date, '%Y-%m-%d') for date in date_list]
 
     return datetime_list
 
 
-def plot_shares(ax, timeline_dict):
+def plot_shares(ax: axes.Axes, timeline_dict: dict):
+    """Plot shares data"""
     shares_dict = timeline_dict['shares']
     non_zero = [key for key in shares_dict.keys() if shares_dict[key] > 0]
 
@@ -26,17 +30,18 @@ def plot_shares(ax, timeline_dict):
                     ha='right', va='bottom')
 
 
-def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
+def plot_timeline(timeline_dict: dict, article_dict: dict,
+                  out_pdf: str = '', save: bool = False) \
+        -> Union[None, figure.Figure]:
     """
-    Purpose:
-      Plot timeline showing views and downloads
+    Plot timeline showing views and downloads
 
-    :param timeline_dict: dict containing daily and cumulative numbers.
-           From stats.Figshare.get_timeline
-    :param article_dict: dictionary of article details.
-           From stats.Figshare.retrieve_article_details
-    :param out_pdf: Output filename. Default: timeline_<article_id>.pdf
-    :param save: bool to save PDF file. Otherwise return matplotlib fig object
+    :param timeline_dict: Contains daily and cumulative numbers.
+           From ``stats.Figshare.get_timeline``
+    :param article_dict: Contains articles details.
+           From ``stats.Figshare.retrieve_article_details``
+    :param out_pdf: Output filename. Default: `timeline_<article_id>.pdf`
+    :param save: Flag to save PDF file. Otherwise returns ``matplotlib`` fig object
 
     :return fig: If save == False, fig is returned
     """
@@ -106,7 +111,7 @@ def plot_timeline(timeline_dict, article_dict, out_pdf=None, save=False):
                         hspace=0.025)
 
     if save:
-        if isinstance(out_pdf, type(None)):
+        if not out_pdf:
             out_pdf = f"timeline_{article_dict['id']}.pdf"
         fig.savefig(out_pdf)
     else:
