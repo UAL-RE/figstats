@@ -24,7 +24,6 @@ if __name__ in '__main__':
                         institute=args.institute)
 
     articles_df = fs.retrieve_institution_articles()
-
     out_pdf = f"{args.institute}_timeline_plots.pdf"
     pp = PdfPages(out_pdf)
 
@@ -42,7 +41,7 @@ if __name__ in '__main__':
                 fig.clear()
             except TypeError:
                 print("TypeError")
-        except HTTPError:
+        except (HTTPError, UnicodeEncodeError):
             pass
 
     print(f"Writing : {out_pdf}")
