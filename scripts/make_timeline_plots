@@ -8,10 +8,14 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 
 if __name__ in '__main__':
-    parser = argparse.ArgumentParser(description='Command-line driver for figstats timeline plots.')
-    parser.add_argument('--api_token', required=True, help='Figshare API token')
-    parser.add_argument('--basic_token', required=True, help='Figshare base64 API stats token')
-    parser.add_argument('--institute', required=True, help='Name of institution')
+    description = 'Command-line driver for figstats timeline plots.'
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--api_token', required=True,
+                        help='Figshare API token')
+    parser.add_argument('--basic_token', required=True,
+                        help='Figshare base64 API stats token')
+    parser.add_argument('--institute', required=True,
+                        help='Name of institution (e.g., "arizona")')
     args = parser.parse_args()
 
     fs = stats.Figshare(api_token=args.api_token,
@@ -29,9 +33,11 @@ if __name__ in '__main__':
         try:
             article_dict = fs.retrieve_article_details(article_id)
             try:
-                timeline_dict = fs.get_timeline(article_id, item='article', institution=True)
+                timeline_dict = fs.get_timeline(article_id, item='article',
+                                                institution=True)
 
-                fig = visualization.plot_timeline(timeline_dict, article_dict, save=False)
+                fig = visualization.plot_timeline(timeline_dict, article_dict,
+                                                  save=False)
                 fig.savefig(pp, format='pdf', bbox_inches='tight')
                 fig.clear()
             except TypeError:
