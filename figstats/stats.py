@@ -23,7 +23,9 @@ class Figshare:
             self.stats_baseurl_institute = join(self.stats_baseurl, self.institute)
 
         # Base64 token
-        self.basic_headers = {'Content-Type': 'application/json'}
+        self.basic_headers0 = {'Content-Type': 'application/json'}
+
+        self.basic_headers = self.basic_headers0.copy()
         self.basic_token = basic_token
         if self.basic_token:
             self.basic_headers['Authorization'] = f'Basic {self.basic_token}'
@@ -180,8 +182,7 @@ class Figshare:
     def retrieve_article_details(self, article_id):
         """Retrieve article details"""
         url = join('https://api.figshare.com/v2/', f"articles/{article_id}")
-
-        article_dict = issue_request('GET', url, self.basic_headers)
+        article_dict = issue_request('GET', url, self.basic_headers0)
         return article_dict
 
     def get_institution_totals(self, df=None, by_method='author'):
