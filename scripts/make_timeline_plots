@@ -10,11 +10,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 if __name__ in '__main__':
     description = 'Command-line driver for figstats timeline plots.'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--api_token', required=True,
+    parser.add_argument('-a', '--api-token', required=True,
                         help='Figshare API token')
-    parser.add_argument('--basic_token', required=True,
+    parser.add_argument('-b', '--basic-token', required=True,
                         help='Figshare base64 API stats token')
-    parser.add_argument('--institute', required=True,
+    parser.add_argument('-i', '--institute', required=True,
                         help='Name of institution (e.g., "arizona")')
     args = parser.parse_args()
 
@@ -37,11 +37,13 @@ if __name__ in '__main__':
 
                 fig = visualization.plot_timeline(timeline_dict, article_dict,
                                                   save=False)
+                print(type(fig))
                 fig.savefig(pp, format='pdf', bbox_inches='tight')
                 fig.clear()
             except TypeError:
                 print("TypeError")
         except (HTTPError, UnicodeEncodeError):
+            print(f"Skipping: {article_id}")
             pass
 
     print(f"Writing : {out_pdf}")
